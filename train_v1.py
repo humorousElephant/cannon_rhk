@@ -10,12 +10,12 @@ import emcee
 import sys
 
 # Output filenames
-output_folder = ''
+output_folder = 'results/'
 results_file = '%strain_v1_theta.txt'%output_folder
-l0_output_file = '%sl0.txt'%output_folder
 
 # Input data; nekaj je tudi ponovljenih opazovanj, ki so neodvisno na tem seznamu
 data_folder = '/home/marusa/rave/cannon_rhk/data'
+l0_output_file = '%s/l0.txt'%data_folder
 data = np.loadtxt('%s/data.txt'%data_folder, comments='#', delimiter=';') # B, Berr, V, Verr, J, Jerr, K, Kerr, EWirt, eEwirt, R'HK, eR'HK
 f = open('%s/fluxes.pkl'%data_folder, 'r') # Samo fluxi pri izbranih valovnih dolzinah, valovne dolzine so zapisane posebej v fajlu wavelengths.txt
 fluxes = pickle.load(f)

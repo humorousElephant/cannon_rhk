@@ -93,7 +93,6 @@ def plot(most_probable_params, best_step, chain, lnprob, nwalkers, ndim, niter):
 	plt.show()
 
 def format_labels(lab):
-	#~ return '; '.join(['%.5f'%x for x in lab[:-2]])
 	return '; '.join(['%.5f'%x for x in lab])
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ import pickle
 #~ theta_file = 'train_v1_theta.txt'
 #~ l0_file = 'l0.txt'
 theta_file = 'results/train_v1_no_0_star_niter_2000.txt'
+#~ theta_file = 'results/train_v1_theta_niter4000.txt'
 l0_file = 'data/l0.txt'
 
 # Data: filenames
@@ -83,9 +84,7 @@ def plot(nwalkers, niter, ndim, chain, lnprob, thetaText, best_step):
 	alpha=0.1
 	
 	# Walkers
-	burnin=0*niter # burnin za risanje
-	
-	print best_step, burnin, best_step-burnin
+	burnin=0.5*niter # burnin za risanje
 	
 	# Posamezni walkerji
 	for n in range(ndim):
@@ -94,7 +93,8 @@ def plot(nwalkers, niter, ndim, chain, lnprob, thetaText, best_step):
 			d=np.array(chain[i][burnin:,n])
 			ax.plot(d, color='black', alpha=alpha)
 		ax.set_xlabel(thetaText[n])
-		plt.axvline(x=best_step-burnin, linewidth=1, color='red')
+		if best_step-burnin>0:
+			plt.axvline(x=best_step-burnin, linewidth=1, color='red')
 		
 	# Lnprob
 	ax=fig.add_subplot(Y_PLOT+1,1,Y_PLOT+1)

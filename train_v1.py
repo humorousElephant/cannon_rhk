@@ -11,7 +11,7 @@ import sys
 
 # Output filenames
 output_folder = 'results/'
-results_file = '%strain_v1_theta.txt'%output_folder
+results_file = '%strain_v1_theta_niter4000.txt'%output_folder
 
 # Input data; nekaj je tudi ponovljenih opazovanj, ki so neodvisno na tem seznamu
 data_folder = '/home/marusa/rave/cannon_rhk/data'
@@ -71,10 +71,10 @@ def lnp(thetaL, f, l):
 
 	return S+prior(thetaL)
 
-def train_bayesian_second_order_1PX(f, l, pool=None, threads=8): # Single pixel
+def train_bayesian_second_order_1PX(f, l, pool=None, threads=8, plot=False, niter=4000): # Single pixel
 	ndim=len(l[0])+1
 	nwalkers=ndim*2 * 2
-	niter=1000 * 2#*4
+	#~ niter=1000 * 4#*4
 
 	p0=initial_positions_of_walkers(ndim, nwalkers)
 	#~ p0=np.random.rand(nwalkers, ndim)
@@ -93,8 +93,9 @@ def train_bayesian_second_order_1PX(f, l, pool=None, threads=8): # Single pixel
 	most_probable_params = chain[max_lnprob_index/lnprob.shape[1], max_lnprob_index%lnprob.shape[1],:]
 	
 	# Narisi walkerje
-	# import plot_results
-	# plot_results.plot(nwalkers, niter, ndim, chain, lnprob, thetaText, max_lnprob_index%lnprob.shape[1])
+	if plot:
+		import plot_results
+		plot_results.plot(nwalkers, niter, ndim, chain, lnprob, thetaText, max_lnprob_index%lnprob.shape[1])
 	
 	return most_probable_params
 
@@ -142,6 +143,30 @@ def train_without_1_star():
 			print line
 
 	POOL.close()
+
+def train_for_1PX(px=0):
+	# V-K, J-K, log R'HK
+	labels=np.array([[1, x[2]-x[6], x[4]-x[6], x[10], (x[2]-x[6])*(x[2]-x[6]), (x[2]-x[6])*(x[4]-x[6]), (x[2]-x[6])*x[10], (x[4]-x[6])*(x[4]-x[6]), (x[4]-x[6])*x[10], x[10]*x[10]] for x in data])
+
+	# Subtract the mean values of labels
+	l0 = [np.mean(labels[:,i+1]) for i in range(labels.shape[1]-1)]
+	for i in range(labels.shape[1]-1):
+		labels[:,i+1] -= l0[i]
+
+	POOL = emcee.utils.MPIPool()
+	if not POOL.is_master():
+		POOL.wait()
+		sys.exit(0)
+
+	theta = train_bayesian_second_order_1PX(fluxes[1:,px], labels[1:], pool=POOL, plot=True, niter=2000)
+
+	if POOL.rank==0:
+		line='; '.join(['%.6e'%x for x in theta])
+		print line
+
+	POOL.close()
 	
 if __name__ == "__main__":
-	train_without_1_star()
+	#~ train_without_1_star() # Cel spekter
+	
+	train_for_1PX(px=0) # Samo izbran pixel, 93: 8542

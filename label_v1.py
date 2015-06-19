@@ -10,7 +10,8 @@ import matplotlib.pylab as plt
 output_folder = ''
 #~ results_file = '%strain_v1_theta.txt'%output_folder
 #~ l0_output_file = '%sl0.txt'%output_folder
-results_file = 'results/train_v1_no_0_star_niter_2000.txt'
+#~ results_file = 'results/train_v1_no_0_star_niter_2000.txt'
+results_file = 'results/train_v1_theta_niter4000.txt'
 l0_output_file = 'data/l0.txt'
 
 # Input data; nekaj je tudi ponovljenih opazovanj, ki so neodvisno na tem seznamu

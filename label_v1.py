@@ -1,5 +1,4 @@
-# Test modela
-# Natreniram brez izbrane zvezde in nato izracunam njene lable s tem modelom
+# Racunam labele izbrane zvezde na podlagi natreniranega modela s train_v1.py
 
 import numpy as np
 import pickle

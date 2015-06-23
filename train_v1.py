@@ -11,13 +11,13 @@ import sys
 
 # Output filenames
 output_folder = 'results/'
-results_file = '%strain_v1_theta_niter4000_vmk.txt'%output_folder
+results_file = '%strain_v1_theta_niter4000_data2.txt'%output_folder
 
 # Input data; nekaj je tudi ponovljenih opazovanj, ki so neodvisno na tem seznamu
 data_folder = '/home/marusa/rave/cannon_rhk/data'
 l0_output_file = '%s/l0.txt'%data_folder
-data = np.loadtxt('%s/data.txt'%data_folder, comments='#', delimiter=';') # B, Berr, V, Verr, J, Jerr, K, Kerr, EWirt, eEwirt, R'HK, eR'HK
-f = open('%s/fluxes.pkl'%data_folder, 'r') # Samo fluxi pri izbranih valovnih dolzinah, valovne dolzine so zapisane posebej v fajlu wavelengths.txt
+data = np.loadtxt('%s/data2.txt'%data_folder, comments='#', delimiter=';') # B, Berr, V, Verr, J, Jerr, K, Kerr, EWirt, eEwirt, R'HK, eR'HK
+f = open('%s/fluxes2.pkl'%data_folder, 'r') # Samo fluxi pri izbranih valovnih dolzinah, valovne dolzine so zapisane posebej v fajlu wavelengths.txt
 fluxes = pickle.load(f)
 f.close()
 
@@ -175,7 +175,7 @@ def train_for_1PX(px=0):
 		POOL.wait()
 		sys.exit(0)
 
-	theta = train_bayesian_second_order_1PX(fluxes[1:,px], labels[1:], pool=POOL, plot=False, niter=2000)
+	theta = train_bayesian_second_order_1PX(fluxes[1:,px], labels[1:], pool=POOL, plot=True, niter=2000)
 
 	if POOL.rank==0:
 		line='; '.join(['%.6e'%x for x in theta])
@@ -204,6 +204,6 @@ def train_for_1PX(px=0):
 	POOL.close()
 	
 if __name__ == "__main__":
-	train_without_1_star() # Cel spekter
+	#~ train_without_1_star() # Cel spekter
 	
-	#~ train_for_1PX(px=93) # Samo izbran pixel, 93: 8542
+	train_for_1PX(px=93) # Samo izbran pixel, 93: 8542

@@ -9,7 +9,9 @@ import pickle
 #~ theta_file = 'train_v1_theta.txt'
 #~ l0_file = 'l0.txt'
 #~ theta_file = 'results/train_v1_no_0_star_niter_2000.txt'
-theta_file = 'results/train_v1_theta_niter4000.txt'
+#~ theta_file = 'results/train_v1_theta_niter4000.txt'
+#~ theta_file = 'results/train_v1_theta_niter4000_vmk.txt'
+theta_file = 'results/train_v1_theta_niter4000_data2.txt'
 l0_file = 'data/l0.txt'
 
 # Data: filenames
@@ -132,9 +134,50 @@ def plot(nwalkers, niter, ndim, chain, lnprob, thetaText, best_step):
 	
 	plt.show()	
 
+def plot_cannon_labels():
+	#~ l=np.loadtxt('results/find_labels.txt', delimiter=';')
+	l=np.loadtxt('results/find_labels_data2.txt', delimiter=';')
+	
+	fig=plt.figure()
+	
+	# histograms
+	#~ bins=40
+	#~ ax=fig.add_subplot(311)
+	#~ d=[x[0]-x[3] for x in l]
+	#~ plt.hist(d, bins=bins)
+	#~ 
+	#~ ax=fig.add_subplot(312)
+	#~ d=[x[1]-x[4] for x in l]
+	#~ plt.hist(d, bins=bins)
+	#~ 
+	#~ ax=fig.add_subplot(313)
+	#~ d=[x[2]-x[5] for x in l]
+	#~ plt.hist(d, bins=bins)
+	
+	
+	# 1:1
+	ax=fig.add_subplot(311)
+	ax.scatter(l[:,0], l[:,3], edgecolor='none')
+	ax.plot([1, 4.5], [1, 4.5], c='k')
+	ax.set_ylabel('V-K')
+
+	ax=fig.add_subplot(312)
+	ax.scatter(l[:,1], l[:,4], edgecolor='none')
+	ax.plot([0.2, 1], [0.2, 1], c='k')
+	ax.set_ylabel('J-K')
+
+	ax=fig.add_subplot(313)
+	ax.scatter(l[:,2], l[:,5], edgecolor='none')
+	ax.plot([-5.5, -3.5], [-5.5, -3.5], c='k')
+	ax.set_ylabel("log R'HK")
+	
+	
+	plt.show()
+
 if __name__ == "__main__":
-	param_sensitivity()
+	#~ param_sensitivity()
 	#~ reconstruct_original_fluxes()
+	plot_cannon_labels()
 	
 	# INPUT DATA STATS
 	#~ color_histograms()

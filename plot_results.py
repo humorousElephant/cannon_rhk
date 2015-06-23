@@ -8,14 +8,39 @@ import pickle
 # Results: filenames
 #~ theta_file = 'train_v1_theta.txt'
 #~ l0_file = 'l0.txt'
-theta_file = 'results/train_v1_no_0_star_niter_2000.txt'
-#~ theta_file = 'results/train_v1_theta_niter4000.txt'
+#~ theta_file = 'results/train_v1_no_0_star_niter_2000.txt'
+theta_file = 'results/train_v1_theta_niter4000.txt'
 l0_file = 'data/l0.txt'
 
 # Data: filenames
 wvl_file = 'data/wavelengths.txt'
 labels_file = 'data/data.txt'
 fluxes_file = 'data/fluxes.pkl'
+
+# PLOT INPUT DATA STATS
+def color_histograms():
+	data = np.loadtxt(labels_file, comments='#', delimiter=';') # B, Berr, V, Verr, J, Jerr, K, Kerr, EWirt, eEwirt, R'HK, eR'HK	
+
+	exclude_lines=[35, 106, 190, 191]
+	for i, ex in enumerate(sorted(exclude_lines)):
+		data = np.delete(data,(ex-i), axis=0)
+		#~ fluxes = np.delete(fluxes,(ex-i), axis=0)
+
+	# Izpisi zvezde, ki imajo magnitudo 0
+	for i, x in enumerate(data):
+		#~ if x[4]<3 or x[6]<3:
+			#~ print i, x
+		if x[5]>0.1 or x[7]>0.1:
+			print i, x
+
+	fig=plt.figure()
+	#~ plt.hist(data[:,4]-data[:,6], bins=20) # J-K
+	plt.hist(data[:,2]-data[:,6], bins=20) # V-K
+	#~ plt.hist(data[:,4], bins=20, alpha=0.3) # J
+	#~ plt.hist(data[:,6], bins=20, alpha=0.3) # K
+	#~ plt.hist(data[:,5], bins=20, alpha=0.3) # Jerr
+	#~ plt.hist(data[:,7], bins=20, alpha=0.3) # Kerr
+	plt.show()
 
 def param_sensitivity():
 	p = np.loadtxt(theta_file, delimiter=';', comments='#')
@@ -108,5 +133,8 @@ def plot(nwalkers, niter, ndim, chain, lnprob, thetaText, best_step):
 	plt.show()	
 
 if __name__ == "__main__":
-	#~ param_sensitivity()
-	reconstruct_original_fluxes()
+	param_sensitivity()
+	#~ reconstruct_original_fluxes()
+	
+	# INPUT DATA STATS
+	#~ color_histograms()

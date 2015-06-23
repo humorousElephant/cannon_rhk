@@ -30,17 +30,29 @@ def prior(thetaL):
 			return -np.inf
 	return 0.0
 
-def lnp(thetaL, flux, l):
-	sL=l[:,-1]
-	thetaL = np.array([1]+list(thetaL)) # Dodam 1, ki se mnozi z baseline theta vrednostjo
+#~ def lnp(thetaL, flux, l):
+	#~ sL=l[:,-1]
+	#~ thetaL = np.array([1]+list(thetaL)) # Dodam 1, ki se mnozi z baseline theta vrednostjo
+#~ 
+	#~ S=0.0
+	#~ for i, f in enumerate(flux):
+		#~ S += (f - l[i,:-1].dot(thetaL))**2 / (sL[i]**2+sigmanL**2) + np.log((sL[i]**2+sigmanL**2))
+#~ 
+	#~ S=-0.5*S
+#~ 
+	#~ return S+prior(thetaL)
+
+def lnp(labels, flux, theta):
+	sL=theta[:,-1]
+	labels = np.array([1]+list(labels)) # Dodam 1, ki se mnozi z baseline theta vrednostjo
 
 	S=0.0
 	for i, f in enumerate(flux):
-		S += (f - l[i,:-1].dot(thetaL))**2 / (sL[i]**2+sigmanL**2) + np.log((sL[i]**2+sigmanL**2))
+		S += (f - theta[i,:-1].dot(labels))**2 / (sL[i]**2+sigmanL**2) + np.log((sL[i]**2+sigmanL**2))
 
 	S=-0.5*S
 
-	return S+prior(thetaL)
+	return S+prior(labels)
 
 def find_labels(f, theta):
 	ndim=theta.shape[1]-2
@@ -86,7 +98,8 @@ def plot(most_probable_params, best_step, chain, lnprob, nwalkers, ndim, niter):
 	ax=fig.add_subplot(Y_PLOT+1,1,Y_PLOT+1)
 	for i in range(nwalkers):
 		ax.plot((lnprob[i][burnin:]), color='black', alpha=alpha)
-	plt.axvline(x=best_step-burnin, linewidth=1, color='red')
+	if best_step-burnin>0:
+		plt.axvline(x=best_step-burnin, linewidth=1, color='red')
 	
 	#~ import triangle
 	#~ fig = triangle.corner(sampler.flatchain, truths=most_probable_params) # labels=thetaText

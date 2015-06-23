@@ -11,7 +11,7 @@ import sys
 
 # Output filenames
 output_folder = 'results/'
-results_file = '%strain_v1_theta_niter4000.txt'%output_folder
+results_file = '%strain_v1_theta_niter4000_vmk.txt'%output_folder
 
 # Input data; nekaj je tudi ponovljenih opazovanj, ki so neodvisno na tem seznamu
 data_folder = '/home/marusa/rave/cannon_rhk/data'
@@ -24,6 +24,23 @@ f.close()
 # Majhen subset podatkov za hitro testiranje, ce sploh dela
 #fluxes=fluxes[:20,:10]
 #data=data[:20]
+
+# Izkljuci zvezde, ker imajo prevelike napake v fotometriji
+exclude_lines=[35, 106, 190, 191]
+#~ for i, ex in enumerate(sorted(exclude_lines)):
+	#~ data = np.delete(data,(ex-i), axis=0)
+	#~ fluxes = np.delete(fluxes,(ex-i), axis=0)
+
+
+# Izloci zvezde, ki imajo velik V-K
+exclude=[]
+for i, x in enumerate(data):
+	if x[2]-x[6]>4:
+		exclude.append(i)
+
+for i, ex in enumerate(sorted(exclude)):
+	data = np.delete(data,(ex-i), axis=0)
+	fluxes = np.delete(fluxes,(ex-i), axis=0)
 
 sigmanL = 0.01 # Izmisljeno!!!!!!!!!
 
@@ -158,15 +175,35 @@ def train_for_1PX(px=0):
 		POOL.wait()
 		sys.exit(0)
 
-	theta = train_bayesian_second_order_1PX(fluxes[1:,px], labels[1:], pool=POOL, plot=True, niter=2000)
+	theta = train_bayesian_second_order_1PX(fluxes[1:,px], labels[1:], pool=POOL, plot=False, niter=2000)
 
 	if POOL.rank==0:
 		line='; '.join(['%.6e'%x for x in theta])
-		print line
+		
+		print 'l0'
+		for t, ll in zip(thetaText[1:-1], l0):
+			print t, ll
+		
+		# Model flux for the first star
+		i=0
+		f=0
+		for t, l in zip(theta, labels[0]):
+			l1=l
+			if i>0 and i<len(theta)-1:
+				l1=l+l0[i-1]
+				#~ print l, l1, l0[i-1]
+			f+=t*l
+			
+			#~ print str(t).rjust(10, ' '), str(l).rjust(10, ' '), str(t)*l1.rjust(10, ' '), str(f).rjust(10, ' ')
+			
+			print '%17s; %.5f; %.5f; %.5f; %.5f; %.5f'%(thetaText[i], l1, l, t, t*l, f)
+			#~ print '%17s; %s; %s; %s; %s'%(thetaText[i], str(t).rjust(10, ' '), str(l).rjust(10, ' '), str(t)*l1.rjust(10, ' '), str(f).rjust(10, ' '))
+			i+=1
+		print 'true f', fluxes[0,px], 'model flux', f, 'delta f', f-fluxes[0,px]
 
 	POOL.close()
 	
 if __name__ == "__main__":
-	#~ train_without_1_star() # Cel spekter
+	train_without_1_star() # Cel spekter
 	
-	train_for_1PX(px=0) # Samo izbran pixel, 93: 8542
+	#~ train_for_1PX(px=93) # Samo izbran pixel, 93: 8542
